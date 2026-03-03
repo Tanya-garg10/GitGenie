@@ -11,6 +11,9 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import crypto from 'crypto';
+// Preview mode globals
+let isPreviewMode = false;
+let previewLogs = [];
 const {
   registerConfigCommand,
   getActiveProviderInstance
@@ -618,6 +621,15 @@ program.on('command:*', async (operands) => {
 });
 
 program.exitOverride();
+// ---------------- PREVIEW MODE DETECTION ----------------
+if (process.argv.includes('--preview')) {
+  isPreviewMode = true;
+
+  // Remove --preview so Commander doesn't complain
+  process.argv = process.argv.filter(arg => arg !== '--preview');
+
+  console.log(chalk.yellow('\n🔍 Running in PREVIEW mode (no Git commands will execute)\n'));
+}
 
 try {
   program.parse(process.argv);
