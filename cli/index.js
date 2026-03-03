@@ -87,7 +87,36 @@ const { handleStatusCommand } = await import(
 
 
 dotenv.config({ debug: false });
-const git = simpleGit();
+const realGit = simpleGit();
+
+const git = new Proxy(realGit, {
+  get(target, prop) {
+    if (typeof target[prop] !== 'function') {
+      return target[prop];
+    }
+
+    return async (...args) => {
+      if (isPreviewMode) {
+        const commandName = String(prop);
+        const formattedArgs = args.map(a =>
+          typeof a === 'object' ? JSON.stringify(a) : String(a)
+        ).join(' ');
+
+        previewLogs.push({
+          type: 'git',
+          action: commandName,
+          args: formattedArgs,
+          timestamp: new Date().toISOString()
+        });
+
+        console.log(chalk.gray(`  ↳ [preview] git ${commandName} ${formattedArgs}`));
+        return Promise.resolve(); // simulate success
+      }
+
+      return target[prop](...args);
+    };
+  }
+});
 
 // Config logic moved to ./commands/config.js
 
