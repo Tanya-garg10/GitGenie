@@ -798,3 +798,5 @@ If you get stuck:
 ---
 
 This document captures the current state of **GitGenie CLI**, including all features, functionality, CLI behavior, project structure, and comprehensive usage examples. It serves as a complete reference for users and developers working with or extending the tool.
+
+# end of line
